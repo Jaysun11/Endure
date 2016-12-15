@@ -7,7 +7,14 @@ public class EnemyManager : MonoBehaviour {
 
 	private int spawnRadius = 5;
 
+
+	public GameObject Splitter;
+	public GameObject littleEnemy;
+	public GameObject BigEnemy;
+	public GameObject BossEnemy;
+
 	public GameObject enemyPrefab;
+	public GameObject barrel;
 
 	private int startWave = 1;
 
@@ -18,7 +25,7 @@ public class EnemyManager : MonoBehaviour {
 	public Spawner[] spawners;
 
 	public HealthKitManager healthKitManager;
-	public KitManager ammoKitManager;
+
 
 	private bool waveCompleted = false;
 	[HideInInspector]
@@ -48,7 +55,7 @@ public class EnemyManager : MonoBehaviour {
 		if (waveCompleted) {
 			currentWave++;
 			gui.SetWave (currentWave);
-			enemiesToSpawn =  currentWave/2 + (int) (Mathf.Pow (currentWave/2, 1.01f));
+			enemiesToSpawn = currentWave;
 			spawnWave ();
 		}
 	
@@ -64,19 +71,75 @@ public class EnemyManager : MonoBehaviour {
 
 	}
 	public void spawnWave() {
-		for (int i = 0; i < 7; i++) {
+		GameObject[] barrels = GameObject.FindGameObjectsWithTag ("Barrel");
+		foreach (GameObject barrel in barrels) {
+			DestroyObject (barrel);
+		}
+		for (int i = 0; i < spawners.Length; i++) {
 			for (int j = 0; j < enemiesToSpawn; j++) {
 
 				spawnPos = spawners[i].gameObject.transform.position + Random.insideUnitSphere * spawnRadius;
-				Vector3 adjustedPos = new Vector3(spawnPos.x, 2.75f, spawnPos.z);
+				Vector3 adjustedPos = new Vector3(spawnPos.x, 1.75f, spawnPos.z);
 
-				Instantiate(enemyPrefab, adjustedPos, Quaternion.identity);
+				int zombieGen = Random.Range (0, 100);
+
+				if (currentWave >= 6) {
+
+					if (zombieGen < 12) {
+						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
+					} else if (zombieGen >= 12 && zombieGen < 20) {
+						Instantiate (BigEnemy, adjustedPos, Quaternion.identity);
+					} else if (zombieGen >= 20 && zombieGen < 28) {
+						Instantiate (BossEnemy, adjustedPos, Quaternion.identity);
+					}  else if (zombieGen >= 28 && zombieGen < 35) {
+						Instantiate (Splitter, adjustedPos, Quaternion.identity);
+					} else {
+						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
+					}
+
+				} else if (currentWave >= 5) {
+
+					if (zombieGen < 12) {
+						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
+					} else if (zombieGen >= 12 && zombieGen < 20) {
+						Instantiate (BigEnemy, adjustedPos, Quaternion.identity);
+					} else if (zombieGen >= 20 && zombieGen < 28) {
+						Instantiate (BossEnemy, adjustedPos, Quaternion.identity);
+					} else {
+						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
+					}
+
+				} else if (currentWave >= 4) {
+					if (zombieGen < 12) {
+						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
+					} else if (zombieGen >= 12 && zombieGen < 20) {
+						Instantiate (BigEnemy, adjustedPos, Quaternion.identity);
+					}
+					else {
+						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
+					}
+				} else if (currentWave >= 3) {
+					if (zombieGen < 12) {
+						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
+					} else {
+						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
+					}
+				} else {
+					Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
+				}
+
+
+				if (Random.Range(0, 100) < 7) {
+					Vector3 barrelpos = spawners[i].gameObject.transform.position + Random.insideUnitSphere * 30;
+					Vector3 barrelpos2 = new Vector3(barrelpos.x, 1f, barrelpos.z);
+					Instantiate(barrel, barrelpos2, Quaternion.identity);
+				}
+					
 
 			}
 			remainingEnemies += enemiesToSpawn;
 		}
 		waveCompleted = false;
-		ammoKitManager.newWave ();
 		healthKitManager.newWave ();
 
 	}

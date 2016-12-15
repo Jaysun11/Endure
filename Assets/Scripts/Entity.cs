@@ -27,9 +27,10 @@ public class Entity : MonoBehaviour {
 
 	void OnCollisionEnter (Collision hit){
 		gui = GameObject.FindGameObjectWithTag ("GUI").GetComponent<GameGUI> ();
-		if (hit.gameObject.tag == "Player") {
-			hit.gameObject.GetComponent<player> ().health -= this.gameObject.GetComponent<Enemy> ().damageDealt;
-			gui.setHealthText (hit.gameObject.GetComponent<player> ().health / hit.gameObject.GetComponent<player> ().maxHealth, hit.gameObject.GetComponent<player> ().health);
+		if (hit.gameObject.tag == "Player" && gameObject.tag != "Barrel") {
+			
+			hit.gameObject.GetComponent<player> ().takeDamage(this.gameObject.GetComponent<Enemy> ().damageDealt);
+
 		}
 
 	}

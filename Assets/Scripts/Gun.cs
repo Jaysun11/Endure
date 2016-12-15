@@ -6,18 +6,12 @@ using System.Collections;
 
 public class Gun : MonoBehaviour {
 
-	private bool reloading;
 
-	[HideInInspector]
-	public GameGUI gui;
-
-	public int totalAmmo =200;
-
-	public int ammoPerMag= 10;
+	public float spread = 6f;
 
 	public LayerMask collisionMask;
 	public LayerMask collisionMask2;
-
+	public LayerMask collisionMask3;
 
 	public Transform spawn;
 	private LineRenderer tracer;
@@ -34,28 +28,29 @@ public class Gun : MonoBehaviour {
 
 	private float nextPossibleShot;
 	private float secondsBetween;
-	private int currentAmmoinMag;
+
 
 	void Start() {
 		secondsBetween = 60 / fireRate;
 		if (GetComponent<LineRenderer> ()) {
 			tracer = GetComponent<LineRenderer> ();
 		}
-		currentAmmoinMag = ammoPerMag;
-		if (gui) {
-			gui.SetAmmoInfo (totalAmmo, currentAmmoinMag);
-		}
+
 	}
 
 	public void Shoot() {
 
 		if (canShoot ()) {
+
+			//SPREAD 
 			float neg = 1;
 			if (Random.Range(0,10) <= 5) {
 				neg = -1;
 			}
 
-			Ray ray = new Ray (spawn.position, Quaternion.Euler (0, Random.Range(0.1f,1) * 5 * neg, 0) * spawn.forward);
+			Ray ray = new Ray (spawn.position, Quaternion.Euler (0, Random.Range(0.1f,1) * spread * neg, 0) * spawn.forward);
+
+			//END SPREAD
 			RaycastHit hit;
 
 			float shotDistance = 40;
@@ -69,14 +64,15 @@ public class Gun : MonoBehaviour {
 				}
 			} else if (Physics.Raycast (ray, out hit, shotDistance, collisionMask2)) {
 				shotDistance = hit.distance;
+			} else if (Physics.Raycast (ray, out hit, shotDistance, collisionMask3)) {
+				shotDistance = hit.distance;
+				if (hit.collider.GetComponent<Entity> ()) {
+
+					hit.collider.GetComponent<Entity> ().takeDamage (damage);
+				}
 			}
 				
 			nextPossibleShot = Time.time + secondsBetween;
-			currentAmmoinMag--;
-
-			if (gui) {
-				gui.SetAmmoInfo (totalAmmo, currentAmmoinMag);
-			}
 
 			GetComponent<AudioSource>().Play ();
 
@@ -99,42 +95,11 @@ public class Gun : MonoBehaviour {
 		if (Time.time < nextPossibleShot) {
 			canShoot = false;
 		}
-
-		if (currentAmmoinMag == 0) {
-			canShoot = false;
-		}
-
-		if (reloading) {
-			canShoot = false;
-		}
-
+			
 		return canShoot;
 	
 	}
-
-	public bool Reload() {
-		if (totalAmmo != 0 && currentAmmoinMag != ammoPerMag) {
-			reloading = true;
-			return true;
-		}
-		return false;
-	}
-
-	public void finishReload() {
-		reloading = false;
-
-		totalAmmo -= (ammoPerMag-currentAmmoinMag);
-		currentAmmoinMag = ammoPerMag;
-		if (totalAmmo < 0) {
-			currentAmmoinMag += totalAmmo;
-			totalAmmo = 0;
-		}
-
-		if (gui) {
-			gui.SetAmmoInfo (totalAmmo, currentAmmoinMag);
-		}
-	}
-
+		
 	public void shootAuto() {
 
 		if (gunType == GunType.Auto) {
@@ -159,10 +124,5 @@ public class Gun : MonoBehaviour {
 		tracer.enabled = false;
 	}
 
-
-	public int getCurrentAmmo() {
-		return currentAmmoinMag;
-	}
-		
 
 }

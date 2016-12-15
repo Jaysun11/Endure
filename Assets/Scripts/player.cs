@@ -30,9 +30,41 @@ public class player : Entity {
 	}
 
 	public override void takeDamage (float dmg) {
-
+		
 		base.takeDamage (dmg);
-		gui.setHealthText (this.health / this.maxHealth, this.health);
+
+		if (health >= 0) {
+			gui.setHealthText (this.health / this.maxHealth, this.health);
+		}
+
+
+
+		if (health <= 0) {
+			Die ();
+		}
+
+	
+	}
+
+	public void GameOver() {
+		if (PlayerPrefs.GetInt ("High Score") <= int.Parse(gui.getScore ())) {
+			PlayerPrefs.SetInt ("High Score", int.Parse(gui.getScore()));
+			gui.setHighScoreText (int.Parse(gui.getScore ()));
+		}
+
+		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
+
+
+		foreach (GameObject enemy in enemies) {
+			DestroyObject (enemy);
+		}
+
+	}
+
+	public override void Die () {
+		
+		base.Die ();
+		GameOver ();
 	}
 
 }

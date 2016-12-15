@@ -7,11 +7,12 @@ public class playerController : MonoBehaviour {
 	public Transform handHold;
 
 	private Vector3 prevDir;
-	private bool reloading;
 	private float rotationSpeed = 950;
-	private float walkSpeed = 5;
-	private float runSpeed = 8;
-
+	private float walkSpeed = 10;
+	private float runSpeed = 12;
+	public float maxRun;
+	private bool depleted = false;
+	private float currentRun;
 	private float acceleration = 5;
 
 	private Vector3 velocityMod;
@@ -31,20 +32,20 @@ public class playerController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		currentRun = maxRun;
         controller = GetComponent<CharacterController>();
 		gui = GameObject.FindGameObjectWithTag ("GUI").GetComponent<GameGUI> ();
 		cam = Camera.main;
+		gui.setHighScoreText (PlayerPrefs.GetInt("High Score"));
 		EquipGun (0);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+		
 		shootable = false;
 
 		controlMouse ();
-
-		//controlMobile ();
 
 
 		if (currentGun) {
@@ -53,29 +54,9 @@ public class playerController : MonoBehaviour {
 			} else if (Input.GetButton ("Shoot")  && shootable) {
 				currentGun.shootAuto ();
 			}
-			if (Input.GetButtonDown ("Reload") || currentGun.getCurrentAmmo() == 0) {
-				if (currentGun.Reload()) {
-					reloading = true;
-
-				}
-			}
-
-			if (reloading) {
-				
-				currentGun.finishReload ();
-				reloading = false;
-
-			}
 
 		}
-
-		for (int i = 0; i < guns.Length; i++) {
-			if (Input.GetKeyDown ((i + 1) + "") || Input.GetKeyDown("[" + (i+1) + "]")) {
-				EquipGun (i);
-				break;
-			}
-
-		}
+			
 	}
 
 	void EquipGun(int i) {
@@ -84,8 +65,6 @@ public class playerController : MonoBehaviour {
 		}
 		currentGun = Instantiate (guns [i], handHold.position, handHold.rotation) as Gun;
 		currentGun.transform.parent = handHold;
-
-		currentGun.gui = gui;
 
 	}
 
@@ -102,7 +81,23 @@ public class playerController : MonoBehaviour {
 		velocityMod = Vector3.MoveTowards (velocityMod, input, acceleration * Time.deltaTime);
 		Vector3 motion = velocityMod;
 		motion *= (Mathf.Abs(input.x) == 1 && Mathf.Abs(input.z) == 1)? .7f:1;
-		motion *= (Input.GetButton ("run")) ? runSpeed : walkSpeed;
+		if (Input.GetButton("run") && currentRun > 0 && depleted == false) {
+			motion *= runSpeed;
+			currentRun--;
+			gui.setSprint (currentRun / maxRun);
+			if (currentRun <= 0) {
+				depleted = true;
+			}
+		} else { 
+			motion *= walkSpeed;
+			if (currentRun < maxRun) {
+				currentRun+=0.25f;
+			} if (currentRun == maxRun) {
+				depleted = false;
+			}
+			gui.setSprint (currentRun / maxRun);
+		}
+
 		motion += Vector3.up * -8;
 
 		controller.Move (motion * Time.deltaTime);
@@ -139,32 +134,9 @@ public class playerController : MonoBehaviour {
 
 
 	}
-
-	void controlWASD() {
-		shootable = true;
-		Vector3 input = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
-
-		if (input != Vector3.zero) {
-			targetRotation = Quaternion.LookRotation (input);
-			transform.eulerAngles = Vector3.up * Mathf.MoveTowardsAngle (transform.eulerAngles.y, targetRotation.eulerAngles.y, rotationSpeed * Time.deltaTime);
-		}
-
-		velocityMod = Vector3.MoveTowards (velocityMod, input, acceleration * Time.deltaTime);
-		Vector3 motion = velocityMod;
-		motion *= (Mathf.Abs(input.x) == 1 && Mathf.Abs(input.z) == 1)? .7f:1;
-		motion *= (Input.GetButton ("run")) ? runSpeed : walkSpeed;
-		motion += Vector3.up * -8;
-
-		controller.Move (motion * Time.deltaTime);
-
-	}
-
+		
 	void OnControllerColliderHit (ControllerColliderHit hit){
-		if (hit.gameObject.tag == "AMMO") {
-			DestroyObject (hit.gameObject);
-			currentGun.totalAmmo += 40;
-			gui.SetAmmoInfo (currentGun.totalAmmo, currentGun.getCurrentAmmo ());
-		} else if (hit.gameObject.tag == "HEALTH" && (this.gameObject.GetComponent<Entity> ().health < this.gameObject.GetComponent<Entity> ().maxHealth)) {
+		if (hit.gameObject.tag == "HEALTH" && (this.gameObject.GetComponent<Entity> ().health < this.gameObject.GetComponent<Entity> ().maxHealth)) {
 			DestroyObject (hit.gameObject);
 			this.gameObject.GetComponent<Entity> ().health += 20;
 			if (this.gameObject.GetComponent<Entity> ().health > this.gameObject.GetComponent<Entity> ().maxHealth) {

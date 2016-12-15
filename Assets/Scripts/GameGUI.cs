@@ -6,7 +6,7 @@ public class GameGUI : MonoBehaviour {
 	public Transform expBar;
 	public Transform healthBar;
 
-	public TextMesh ammoText;
+	public Transform SprintBar;
 
 	public TextMesh levelText;
 
@@ -17,6 +17,14 @@ public class GameGUI : MonoBehaviour {
 	public TextMesh waveText;
 
 	public TextMesh remainingText;
+
+	public TextMesh highText;
+
+	public void setHighScoreText(int text) {
+
+		highText.text = "" + text;
+
+	}
 
 	public void setExpText(float percentTolevel, int playerLevel) {
 
@@ -29,15 +37,14 @@ public class GameGUI : MonoBehaviour {
 		healthText.text = "Health: " + playerHealth;
 		healthBar.localScale = new Vector3 (percentHealth, 1, 1);
 
+	}
+	public void setSprint(float percentSprint) {
+
+
+		SprintBar.localScale = new Vector3 (percentSprint, 1, 1);
 
 	}
-
-	public void SetAmmoInfo(int total, int current) {
-
-		ammoText.text = "Ammo:  " + current + " / " + total;
-
-	}
-
+		
 
 	public void SetWave(int wave) {
 
@@ -48,6 +55,12 @@ public class GameGUI : MonoBehaviour {
 	public void setScore(float score) {
 
 		scoreText.text = score + "";
+
+	}
+
+	public string getScore() {
+
+		return scoreText.text;
 
 	}
 
