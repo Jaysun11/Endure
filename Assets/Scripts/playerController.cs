@@ -30,8 +30,16 @@ public class playerController : MonoBehaviour {
 
 	private GameGUI gui;
 
+	public Canvas PauseMenu;
+
+
 	// Use this for initialization
 	void Start () {
+
+		PauseMenu = PauseMenu.GetComponent<Canvas> ();
+		PauseMenu.enabled = false;
+	
+
 		currentRun = maxRun;
         controller = GetComponent<CharacterController>();
 		gui = GameObject.FindGameObjectWithTag ("GUI").GetComponent<GameGUI> ();
@@ -55,6 +63,14 @@ public class playerController : MonoBehaviour {
 				currentGun.shootAuto ();
 			}
 
+		}
+
+		if (Input.GetKeyDown (KeyCode.Escape)) {
+			PauseMenu.enabled = true;
+			Time.timeScale = 0.0f;
+		} else if (Time.timeScale == 1.0f) {
+
+			PauseMenu.enabled = false;
 		}
 			
 	}

@@ -7,15 +7,24 @@ public class player : Entity {
 	private float currentLevelExperience;
 	private float experienceToLevel;
 
+	public GameObject gameOverScreen;
+
 	void Start() {
-		levelUP ();
+		gameOverScreen.GetComponent<Canvas>().enabled = false;
+		level = PlayerPrefs.GetInt ("LEVEL");
+		currentLevelExperience = PlayerPrefs.GetFloat ("LEVELEXP");
+		experienceToLevel = PlayerPrefs.GetFloat ("EXP TO LEVEL");
 		gui.setHealthText (this.health / this.maxHealth, this.health);
+		AddExperience (0);
 	}
 
 	public void AddExperience(float exp) {
 		currentLevelExperience += exp;
+		PlayerPrefs.SetFloat ("LEVELEXP", currentLevelExperience);
+
 		if (currentLevelExperience >= experienceToLevel) {
 			currentLevelExperience -= experienceToLevel;
+			PlayerPrefs.SetFloat ("LEVELEXP", currentLevelExperience);
 			levelUP ();
 		}
 
@@ -24,8 +33,9 @@ public class player : Entity {
 
 	private void levelUP() {
 		level++;
+		PlayerPrefs.SetInt ("LEVEL", level);
 		experienceToLevel = level * 50 + Mathf.Pow (level * 2, 2);
-
+		PlayerPrefs.SetFloat ("EXP TO LEVEL", experienceToLevel);
 		AddExperience (0);
 	}
 
@@ -47,6 +57,7 @@ public class player : Entity {
 	}
 
 	public void GameOver() {
+
 		if (PlayerPrefs.GetInt ("High Score") <= int.Parse(gui.getScore ())) {
 			PlayerPrefs.SetInt ("High Score", int.Parse(gui.getScore()));
 			gui.setHighScoreText (int.Parse(gui.getScore ()));
@@ -58,6 +69,9 @@ public class player : Entity {
 		foreach (GameObject enemy in enemies) {
 			DestroyObject (enemy);
 		}
+
+
+		gameOverScreen.GetComponent<Canvas> ().enabled = true;
 
 	}
 
