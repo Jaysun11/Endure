@@ -7,6 +7,7 @@ public class HealthKitManager : MonoBehaviour {
 
 	private GameObject[] kits;
 
+
 	public void newWave() {
 		kits = GameObject.FindGameObjectsWithTag ("HEALTH");
 		foreach (GameObject pack in kits) {

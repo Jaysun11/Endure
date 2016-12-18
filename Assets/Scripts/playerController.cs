@@ -15,6 +15,17 @@ public class playerController : MonoBehaviour {
 	private float currentRun;
 	private float acceleration = 5;
 
+	//BUFFS
+	public bool damageOn = false;
+	private int damageDuration;
+	private float damageStarts;
+	private bool speedOn = false;
+	private int speedDuration;
+	private float speedStarts;
+	public bool shieldOn = false;
+	private int shieldDuration;
+	private float shieldStarts;
+
 	private Vector3 velocityMod;
 
 	//System Variables
@@ -33,12 +44,17 @@ public class playerController : MonoBehaviour {
 	public Canvas PauseMenu;
 
 
+
 	// Use this for initialization
 	void Start () {
 
+		walkSpeed += (PlayerPrefs.GetInt("speed") * 0.05f);
+		runSpeed += (PlayerPrefs.GetInt("speed") * 0.05f);
+
+
 		PauseMenu = PauseMenu.GetComponent<Canvas> ();
 		PauseMenu.enabled = false;
-	
+
 
 		currentRun = maxRun;
         controller = GetComponent<CharacterController>();
@@ -50,7 +66,26 @@ public class playerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+
+		if (Time.time - speedStarts >= speedDuration) {
+			speedOn = false;
+		}
+		if (Time.time - shieldStarts >= shieldDuration) {
+			shieldOn = false;
+		}
+		if (Time.time - damageStarts >= damageDuration) {
+			damageOn = false;
+		}
+
+
+		if (speedOn) {
+			walkSpeed = 18;
+			runSpeed = 20;
+		} else if (!speedOn) {
+			walkSpeed = 10 +(PlayerPrefs.GetInt("speed") * 0.05f);
+			runSpeed = 12 + (PlayerPrefs.GetInt("speed") * 0.05f);
+		}
+
 		shootable = false;
 
 		controlMouse ();
@@ -59,8 +94,10 @@ public class playerController : MonoBehaviour {
 		if (currentGun) {
 			if (Input.GetButtonDown ("Shoot") && shootable) {
 				currentGun.Shoot ();	
+
 			} else if (Input.GetButton ("Shoot")  && shootable) {
 				currentGun.shootAuto ();
+			
 			}
 
 		}
@@ -159,6 +196,29 @@ public class playerController : MonoBehaviour {
 				this.gameObject.GetComponent<Entity> ().health = this.gameObject.GetComponent<Entity> ().maxHealth;
 			}
 			gui.setHealthText (this.gameObject.GetComponent<Entity> ().health/ this.gameObject.GetComponent<Entity> ().maxHealth, this.gameObject.GetComponent<Entity> ().health);
+		}
+
+		if (hit.gameObject.tag == "DamageBuff") {
+			DestroyObject (hit.gameObject);
+			damageOn = true;
+			damageStarts = Time.time;
+			damageDuration = 10;
+		}
+
+		if (hit.gameObject.tag == "ShieldBuff") {
+			DestroyObject (hit.gameObject);
+			shieldOn = true;
+			shieldStarts = Time.time;
+			shieldDuration = 10;
+		}
+
+		if (hit.gameObject.tag == "SpeedBuff") {
+			Debug.Log ("Here");
+			DestroyObject (hit.gameObject);
+			speedOn = true;
+			speedStarts = Time.time;
+			speedDuration = 10;
+
 		}
 
 	

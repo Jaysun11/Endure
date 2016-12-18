@@ -25,7 +25,7 @@ public class Enemy : Entity {
 	void Start() {
 		
 		enemyManager = GameObject.FindGameObjectWithTag ("Manager").GetComponent<EnemyManager> ();
-		
+
 	}
 
 	void Update() {
@@ -34,7 +34,9 @@ public class Enemy : Entity {
 			player = GameObject.FindGameObjectWithTag ("Player").GetComponent<player>();
 			playerTrans = player.transform;
 		}
-		transform.rotation = Quaternion.Slerp (transform.rotation, Quaternion.LookRotation (playerTrans.position - transform.position), speedRotation * Time.deltaTime);
+		var lookPos = playerTrans.position - transform.position;
+		lookPos.y = 0;
+		transform.rotation = Quaternion.Slerp (transform.rotation, Quaternion.LookRotation (lookPos), speedRotation * Time.deltaTime);
 		transform.position += transform.forward * MoveSpeed * Time.deltaTime;
 
 
@@ -79,7 +81,7 @@ public class Enemy : Entity {
 				text1 = "+500";
 				break;
 			}
-		case "Splitter(Clone)":
+		case "RegSplitter(Clone)":
 			{
 				enemyManager.Score += 200;
 				text1 = "+200";
@@ -104,14 +106,14 @@ public class Enemy : Entity {
 		Vector3 spawnPos = gameObject.transform.position + Random.insideUnitSphere * 10;
 		Vector3 adjustedPos = new Vector3(spawnPos.x, 1.75f, spawnPos.z);
 
-		if (gameObject.name == "RegSplitter") {
+		if (gameObject.name == "RegSplitter(Clone)") {
 			for (int i = 0;  i < 2; i++) {
 				enemyManager.remainingEnemies++;
 				Instantiate (splitter1, adjustedPos, Quaternion.identity);
 			}
 
 		} 
-		if (gameObject.name == "Splitter1") {
+		if (gameObject.name == "Splitter1(Clone)") {
 			Debug.Log ("HERE");
 			for (int i = 0;  i < 3; i++) {
 				enemyManager.remainingEnemies++;

@@ -79,19 +79,23 @@ public class EnemyManager : MonoBehaviour {
 			for (int j = 0; j < enemiesToSpawn; j++) {
 
 				spawnPos = spawners[i].gameObject.transform.position + Random.insideUnitSphere * spawnRadius;
-				Vector3 adjustedPos = new Vector3(spawnPos.x, 1.75f, spawnPos.z);
+				Vector3 adjustedPos = new Vector3(spawnPos.x, 1.52f, spawnPos.z);
 
 				int zombieGen = Random.Range (0, 100);
 
 				if (currentWave >= 6) {
 
 					if (zombieGen < 12) {
+						adjustedPos = new Vector3(spawnPos.x, 1.18f, spawnPos.z);
 						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
 					} else if (zombieGen >= 12 && zombieGen < 20) {
+						adjustedPos = new Vector3(spawnPos.x, 2.0f, spawnPos.z);
 						Instantiate (BigEnemy, adjustedPos, Quaternion.identity);
 					} else if (zombieGen >= 20 && zombieGen < 28) {
+						adjustedPos = new Vector3(spawnPos.x, 3.45f, spawnPos.z);
 						Instantiate (BossEnemy, adjustedPos, Quaternion.identity);
 					}  else if (zombieGen >= 28 && zombieGen < 35) {
+						adjustedPos = new Vector3(spawnPos.x, 1.7f, spawnPos.z);
 						Instantiate (Splitter, adjustedPos, Quaternion.identity);
 					} else {
 						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
@@ -100,10 +104,13 @@ public class EnemyManager : MonoBehaviour {
 				} else if (currentWave >= 5) {
 
 					if (zombieGen < 12) {
+						adjustedPos = new Vector3(spawnPos.x, 1.18f, spawnPos.z);
 						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
 					} else if (zombieGen >= 12 && zombieGen < 20) {
+						adjustedPos = new Vector3(spawnPos.x, 2.0f, spawnPos.z);
 						Instantiate (BigEnemy, adjustedPos, Quaternion.identity);
 					} else if (zombieGen >= 20 && zombieGen < 28) {
+						adjustedPos = new Vector3(spawnPos.x, 3.45f, spawnPos.z);
 						Instantiate (BossEnemy, adjustedPos, Quaternion.identity);
 					} else {
 						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);
@@ -111,8 +118,10 @@ public class EnemyManager : MonoBehaviour {
 
 				} else if (currentWave >= 4) {
 					if (zombieGen < 12) {
+						adjustedPos = new Vector3(spawnPos.x, 1.18f, spawnPos.z);
 						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
 					} else if (zombieGen >= 12 && zombieGen < 20) {
+						adjustedPos = new Vector3(spawnPos.x, 2.0f, spawnPos.z);
 						Instantiate (BigEnemy, adjustedPos, Quaternion.identity);
 					}
 					else {
@@ -120,6 +129,7 @@ public class EnemyManager : MonoBehaviour {
 					}
 				} else if (currentWave >= 3) {
 					if (zombieGen < 12) {
+						adjustedPos = new Vector3(spawnPos.x, 1.18f, spawnPos.z);
 						Instantiate (littleEnemy, adjustedPos, Quaternion.identity);
 					} else {
 						Instantiate (enemyPrefab, adjustedPos, Quaternion.identity);

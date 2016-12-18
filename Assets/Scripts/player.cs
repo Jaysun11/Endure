@@ -32,11 +32,18 @@ public class player : Entity {
 	}
 
 	private void levelUP() {
-		level++;
-		PlayerPrefs.SetInt ("LEVEL", level);
-		experienceToLevel = level * 50 + Mathf.Pow (level * 2, 2);
-		PlayerPrefs.SetFloat ("EXP TO LEVEL", experienceToLevel);
-		AddExperience (0);
+		if (level < 300) {
+
+			level++;
+
+			PlayerPrefs.SetInt ("LEVEL", level);
+			PlayerPrefs.SetInt ("pointsToSpend", PlayerPrefs.GetInt ("pointsToSpend") + 1);
+
+			experienceToLevel = level * 50 + Mathf.Pow (level * 2, 2);
+			PlayerPrefs.SetFloat ("EXP TO LEVEL", experienceToLevel);
+			AddExperience (0);
+
+		}
 	}
 
 	public override void takeDamage (float dmg) {

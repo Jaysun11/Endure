@@ -6,7 +6,7 @@ using System.Collections;
 
 public class Gun : MonoBehaviour {
 
-
+	public int gunOn;
 	public float spread = 6f;
 
 	public LayerMask collisionMask;
@@ -22,7 +22,10 @@ public class Gun : MonoBehaviour {
 	public GunType gunType;
 	public Rigidbody shell;
 
-	public float damage = 5;
+	private float damage = 5;
+
+	public int damageMultipler;
+
 
 	public float fireRate;
 
@@ -31,7 +34,14 @@ public class Gun : MonoBehaviour {
 
 
 	void Start() {
+		damageMultipler = PlayerPrefs.GetInt("damage");
+		damage += (damageMultipler * 0.3f);
+		spread -= (0.05f * PlayerPrefs.GetInt("accuracy"));
+
 		secondsBetween = 60 / fireRate;
+
+	
+
 		if (GetComponent<LineRenderer> ()) {
 			tracer = GetComponent<LineRenderer> ();
 		}
@@ -39,6 +49,21 @@ public class Gun : MonoBehaviour {
 	}
 
 	public void Shoot() {
+
+		if (GameObject.FindGameObjectWithTag ("Player").GetComponent<playerController> ().damageOn) {
+			secondsBetween = (60 / fireRate)/2;
+			gameObject.GetComponent<AudioSource> ().volume = 0.25f;
+		} else {
+			gameObject.GetComponent<AudioSource> ().volume = 0.05f;
+			secondsBetween = 60 / fireRate;
+		}
+
+
+		if (PlayerPrefs.GetInt ("GunOn") == 1) {
+			gameObject.GetComponent<AudioSource> ().mute = false;
+		} else if (PlayerPrefs.GetInt ("GunOn") == 0) {
+			gameObject.GetComponent<AudioSource> ().mute = true;
+		}
 
 		if (canShoot ()) {
 
@@ -59,7 +84,6 @@ public class Gun : MonoBehaviour {
 				shotDistance = hit.distance;
 
 				if (hit.collider.GetComponent<Entity> ()) {
-
 					hit.collider.GetComponent<Entity> ().takeDamage (damage);
 				}
 			} else if (Physics.Raycast (ray, out hit, shotDistance, collisionMask2)) {
@@ -104,6 +128,7 @@ public class Gun : MonoBehaviour {
 
 		if (gunType == GunType.Auto) {
 			Shoot ();
+
 		}
 
 	}
